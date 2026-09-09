@@ -1,156 +1,162 @@
-# 🎬 AI Video Producer - Tự Động Hóa Sản Xuất Video Dạng Chạy Ảnh (Ken Burns Storytelling)
+<div align="right">
+  <strong>Language:</strong>
+  <strong>🇺🇸 English</strong> |
+  <a href="./README_VI.md">🇻🇳 Tiếng Việt</a>
+</div>
+
+# 🎬 AI Video Producer - Automated Image-Based Video Production (Ken Burns Storytelling)
 
 > [!NOTE]
-> **ĐỊNH DẠNG VIDEO CỐT LÕI**: Đây là hệ thống tự động sản xuất **Video dạng chạy ảnh động kể chuyện (Image-Based Storytelling / Ken Burns Slideshow)**. 
-> Toàn bộ video được tạo nên từ **chuỗi ảnh tĩnh AI với số lượng linh hoạt tùy ý (10, 30, 60, 120+ ảnh...)**, được thổi hồn bằng các chuyển động điện ảnh (*Zoom in, Zoom out, Pan lia máy*) và chuyển cảnh mờ chồng (*Crossfade*), đồng bộ khớp từng mili-giây với giọng đọc AI chuyên nghiệp.
+> **CORE VIDEO FORMAT**: This system automatically produces **Image-Based Storytelling / Ken Burns Slideshow Videos**.
+> The entire video is composed of a **dynamic sequence of AI-generated still images (10, 30, 60, 120+ scenes — fully customizable)**, brought to life with cinematic camera motions (*Zoom in, Zoom out, Pan left/right/up*) and smooth crossfade transitions, synchronized millisecond-by-millisecond with professional AI voiceover narration.
 
-Hệ thống kết hợp quy trình khép kín: **LLM (ChatGPT/Claude/Gemini)** ➔ **NotebookLM (Sinh ảnh AI hàng loạt)** ➔ **Google Drive** ➔ **Google Colab (Dựng video chạy ảnh siêu tốc bằng GPU NVENC)**.
-
----
-
-## ✨ Điểm Nổi Bật Của Định Dạng Video Chạy Ảnh
-
-* 📸 **Biến Ảnh Tĩnh Thành Thước Phim Động (Ken Burns Effect):** Mỗi bức ảnh tĩnh được áp dụng hiệu ứng camera giả lập bằng OpenCV C++ (phóng to, thu nhỏ, quét ngang, lia dọc), loại bỏ cảm giác xem ảnh tĩnh nhàm chán.
-* 🪄 **Chuyển Cảnh Mượt Mà (Crossfade & Fade):** Chuyển tiếp giữa các bức ảnh bằng hiệu ứng hòa tan mờ chồng (Crossfade) 0.5s và mờ đen (Fade to black) với video kết thúc (Outro).
-* 🔢 **Tùy Biến Số Lượng Phân Cảnh (Không Giới Hạn):** Bạn có thể làm video ngắn (10–20 ảnh) hoặc video dài tài liệu (60, 100, 120+ ảnh). Code sẽ tự động nhận diện và tính toán thời lượng tương ứng.
-* 🎙️ **Đồng Bộ Giọng Đọc & Thời Lượng Từng Ảnh:** Mỗi bức ảnh hiển thị chuẩn xác theo thời lượng câu đọc của AI (`edge-tts`), không bị lệch hình hay hụt tiếng.
-* ⚡ **Tối Ưu Chi Phí & Tốc Độ:** Thay vì tốn kém chi phí render video AI (Runway, Sora...), hệ thống tạo video documentary/storytelling chạy ảnh chỉ mất **vài phút đến 15 phút** trên Google Colab Free (T4 GPU).
+The end-to-end automated pipeline connects: **LLMs (ChatGPT / Claude / Gemini)** ➔ **NotebookLM (Batch AI Image Generation)** ➔ **Google Drive** ➔ **Google Colab (Hardware-Accelerated Video Rendering via GPU NVENC)**.
 
 ---
 
-## 📌 Sơ Đồ Quy Trình Tổng Quan (Pipeline)
+## ✨ Key Highlights of Image-Based Video Production
+
+* 📸 **Transforming Still Images into Cinematic Shots (Ken Burns Effect):** Each static image is animated with smooth virtual camera motions using high-performance OpenCV C++ (zooming, panning), completely eliminating static presentation fatigue.
+* 🪄 **Seamless Transitions (Crossfade & Fade to Black):** Elegant 0.5s crossfade blends between sequential scenes, with a smooth fade-to-black transition into the ending video (Outro).
+* 🔢 **Arbitrary & Dynamic Scene Count (No Fixed Limits):** Create short videos (10–20 images) or in-depth documentary videos (60, 100, 120+ images). The pipeline dynamically detects and calculates durations automatically.
+* 🎙️ **Precise Audio-Visual Synchronization:** Each image duration is automatically aligned down to the millisecond with each sentence spoken by neural AI voiceover (`edge-tts`).
+* ⚡ **Ultra-Fast & Cost-Effective:** Instead of expensive AI video generation tools (Runway, Sora, etc.), render full 10–20 minute image-driven storytelling videos in just **5 to 15 minutes** using Google Colab Free (T4 GPU).
+
+---
+
+## 📌 Pipeline Architecture
 
 ```mermaid
 flowchart TD
-    A["💡 Bước 1: Kịch bản & Prompt ảnh<br/>(Tùy chọn N phân cảnh theo ý muốn)"] -->|Xuất scenes_data & prompt ảnh| B["📄 File Kịch bản<br/>(tên_dự_án.txt)"]
-    B --> C["🎨 Bước 2: Tạo ảnh tỷ lệ 16:9<br/>(Google NotebookLM)"]
-    C -->|Xuất các file PDF theo đợt| D["📚 Các File PDF Ảnh<br/>(clean_1.pdf ➔ clean_N.pdf)"]
-    D --> E["☁️ Bước 3: Đưa ảnh lên Google Drive<br/>(/MyDrive/AI VIDEO/tên_dự_án/)"]
+    A["💡 Step 1: Script & Image Prompts<br/>(Choose N scenes as desired)"] -->|Generates scenes_data & prompts| B["📄 Script Text File<br/>(project_name.txt)"]
+    B --> C["🎨 Step 2: Generate 16:9 Images<br/>(Google NotebookLM)"]
+    C -->|Export in PDF batches| D["📚 Image PDF Files<br/>(clean_1.pdf ➔ clean_N.pdf)"]
+    D --> E["☁️ Step 3: Upload to Google Drive<br/>(/MyDrive/AI VIDEO/project_name/)"]
     B --> E
-    E --> F["🚀 Bước 4: Colab tự quét và biến ảnh thành Video<br/>(Video_producer.ipynb)"]
-    F -->|Ken Burns + Crossfade + Audio + GPU NVENC| G["🎥 Video Chạy Ảnh Hoàn Chỉnh<br/>(COMPLETE_VIDEO.mp4)"]
+    E --> F["🚀 Step 4: Colab Converts Images to Video<br/>(Video_producer.ipynb)"]
+    F -->|Ken Burns + Crossfade + Audio + GPU NVENC| G["🎥 Complete Storytelling Video<br/>(COMPLETE_VIDEO.mp4)"]
 ```
 
 ---
 
-## 📂 Cấu Trúc Thư Mục Chuẩn Trên Google Drive
+## 📂 Google Drive Directory Structure
 
-Toàn bộ code trong [`Video_producer.ipynb`](./Video_producer.ipynb) được thiết kế để tự động quét toàn bộ file PDF ảnh có trong thư mục `image/` và xuất video theo cấu trúc:
+[`Video_producer.ipynb`](./Video_producer.ipynb) automatically scans all image PDF files in the `image/` directory and renders the video according to the following layout in `My Drive / AI VIDEO`:
 
 ```text
 MyDrive/
 └── AI VIDEO/
     │
-    ├── material/                                 <-- Thư mục tài nguyên dùng chung
-    │   └── theend.mp4                            <-- Video outro/kết thúc (tùy chọn)
+    ├── material/                                 <-- Shared assets directory
+    │   └── theend.mp4                            <-- Outro / Ending video (optional)
     │
-    └── <SUB_FOLDER_NAME>/                        <-- Thư mục dự án cụ thể (Ví dụ: lion_social)
+    └── <SUB_FOLDER_NAME>/                        <-- Specific project folder (e.g., lion_social)
         │
-        ├── <SUB_FOLDER_NAME>.txt                 <-- Kịch bản chứa JSON N phân cảnh (lion_social.txt)
+        ├── <SUB_FOLDER_NAME>.txt                 <-- Script containing N scenes JSON (lion_social.txt)
         │
-        ├── image/                                <-- [BẮT BUỘC]: Chứa các file PDF ảnh từ NotebookLM
-        │   ├── clean_1.pdf                       <-- Đợt ảnh thứ 1 (Ví dụ: ảnh 1 - 20)
-        │   ├── clean_2.pdf                       <-- Đợt ảnh thứ 2 (Ví dụ: ảnh 21 - 40)
-        │   ├── clean_3.pdf                       <-- Đợt ảnh thứ 3 (Ví dụ: ảnh 41 - 60)
-        │   └── ...                               <-- Thêm clean_4.pdf, clean_5.pdf... tùy độ dài dự án
+        ├── image/                                <-- [REQUIRED]: Image PDF files from NotebookLM
+        │   ├── clean_1.pdf                       <-- 1st batch of images (e.g., scenes 1 - 20)
+        │   ├── clean_2.pdf                       <-- 2nd batch of images (e.g., scenes 21 - 40)
+        │   ├── clean_3.pdf                       <-- 3rd batch of images (e.g., scenes 41 - 60)
+        │   └── ...                               <-- Add clean_4.pdf, clean_5.pdf... as needed
         │
-        │── [CÁC THƯ MỤC TỰ ĐỘNG SINH RA KHI CHẠY CODE - KHÔNG CẦN TẠO TAY]:
+        │── [DIRECTORIES CREATED AUTOMATICALLY BY CODE - DO NOT CREATE MANUALLY]:
         │
-        ├── clean_image/                          <-- Nơi giải nén toàn bộ ảnh (1.jpg, 2.jpg... N.jpg)
-        ├── audio/                                <-- Nơi lưu full_narration_audio.mp3 & scenes_timed.json
-        └── video/                                <-- Chứa video kết xuất cuối cùng: COMPLETE_VIDEO.mp4
+        ├── clean_image/                          <-- Extracted lossless raw images (1.jpg, 2.jpg... N.jpg)
+        ├── audio/                                <-- Stores full_narration_audio.mp3 & scenes_timed.json
+        └── video/                                <-- Final exported video: COMPLETE_VIDEO.mp4
 ```
 
 > [!TIP]
-> Các thư mục `clean_image/`, `audio/`, và `video/` sẽ **tự động được tạo** khi chạy code. Hệ thống sẽ tự động quét tuần tự từ `clean_1.pdf` trở đi cho đến khi hết file thì thôi.
+> The `clean_image/`, `audio/`, and `video/` folders will be **automatically created** during execution. The system scans sequentially starting from `clean_1.pdf` onwards until all files are processed.
 
 ---
 
-## 📝 Chi Tiết 4 Bước Thực Hiện
+## 📝 Step-by-Step Guide
 
-### Bước 1: Tạo kịch bản kể chuyện & Prompt ảnh
-1. Mở một trong các công cụ AI: **ChatGPT**, **Claude**, hoặc **Gemini**.
-2. Sao chép nội dung prompt mẫu: [`content&image_generator_prompt.txt`](./content&image_generator_prompt.txt).
-3. Điền chủ đề và **số lượng phân cảnh bạn mong muốn** vào dòng cuối (mặc định là 120 scenes, bạn hoàn toàn có thể yêu cầu 20, 40, 60, 80 scenes tùy ý):
+### Step 1: Generate Storytelling Script & Image Prompts
+1. Open an LLM of your choice: **ChatGPT**, **Claude**, or **Gemini**.
+2. Copy the template prompt from: [`content&image_generator_prompt.txt`](./content&image_generator_prompt.txt).
+3. Specify your desired topic and **exact number of scenes** at the end (default is 120 scenes; you can request 20, 40, 60, 80, etc.):
    ```text
-   === [ĐIỀN Ý TƯỞNG / CHỦ ĐỀ & SỐ LƯỢNG SCENES CỦA BẠN VÀO ĐÂY] ===
-   Ví dụ: Hãy tạo kịch bản 40 phân cảnh kể về cuộc đời của Nikola Tesla...
+   === [ENTER YOUR TOPIC & NUMBER OF SCENES HERE] ===
+   Example: Create a 40-scene storytelling script about the life of Nikola Tesla...
    ```
-4. AI sẽ xuất ra kịch bản dạng chuỗi JSON:
-   * **`SUB_FOLDER_NAME`**: Tên thư mục dự án (viết liền không dấu, ví dụ: `tesla_story`).
-   * **`scenes_data`**: Mảng JSON chứa danh sách các cảnh gồm câu dẫn chuyện (`script_en`) và prompt ảnh tương ứng (`image_generation_prompt`).
-5. Lưu kết quả thành file text: `<SUB_FOLDER_NAME>.txt` (ví dụ: `tesla_story.txt`).
+4. The AI will output a structured script:
+   * **`SUB_FOLDER_NAME`**: Project folder identifier without special characters (e.g., `tesla_story`).
+   * **`scenes_data`**: JSON array containing scene entries with narration (`script_en`) and prompt description (`image_generation_prompt`).
+5. Save the entire result as a plain text file: `<SUB_FOLDER_NAME>.txt` (e.g., `tesla_story.txt`).
 
 ---
 
-### Bước 2: Tạo ảnh tỷ lệ 16:9 bằng NotebookLM
-1. Truy cập [Google NotebookLM](https://notebooklm.google.com/) và tạo một Notebook mới.
-2. Nạp file `<SUB_FOLDER_NAME>.txt` làm **Tài liệu nguồn (Source)**.
-3. Mở file: [`prompt_notebooklm.txt`](./prompt_notebooklm.txt).
-4. **Quy tắc tạo ảnh linh hoạt theo đợt (Batching):**
-   * NotebookLM tạo ảnh ổn định và chuẩn xác nhất khi chia theo từng đợt **khoảng 10 đến 20 ảnh/lần**.
-   * Bạn tạo bao nhiêu ảnh thì chia bấy nhiêu đợt tương ứng và tải các file PDF về:
+### Step 2: Generate 16:9 Images via NotebookLM
+1. Visit [Google NotebookLM](https://notebooklm.google.com/) and create a new notebook.
+2. Upload `<SUB_FOLDER_NAME>.txt` as a **Source document**.
+3. Open the generation prompt guide: [`prompt_notebooklm.txt`](./prompt_notebooklm.txt).
+4. **Batch Generation Rule:**
+   * NotebookLM works most reliably when generating images in batches of **10 to 20 images per prompt**.
+   * Run prompts in sequential batches and download the generated slide deck PDFs:
 
-| Đợt tạo ảnh | Khoảng phân cảnh (Ví dụ mẫu) | Tên file PDF sau khi tải về |
+| Batch | Scene Range (Example) | PDF Download Filename |
 |:---:|:---|:---|
-| **Đợt 1** | Ảnh từ 1 đến 20 | `clean_1.pdf` |
-| **Đợt 2** | Ảnh từ 21 đến 40 | `clean_2.pdf` |
-| **Đợt 3** | Ảnh từ 41 đến 60 | `clean_3.pdf` |
-| **Đợt ...**| Ảnh tiếp theo cho đến hết kịch bản | `clean_4.pdf`, `clean_5.pdf`... |
+| **Batch 1** | Images 1 to 20 | `clean_1.pdf` |
+| **Batch 2** | Images 21 to 40 | `clean_2.pdf` |
+| **Batch 3** | Images 41 to 60 | `clean_3.pdf` |
+| **Batch ...**| Next batches until script completion | `clean_4.pdf`, `clean_5.pdf`... |
 
 > [!IMPORTANT]
-> **Quy tắc đặt tên file PDF:** Bắt buộc đặt tên theo thứ tự nối tiếp: `clean_1.pdf`, `clean_2.pdf`, `clean_3.pdf`, `clean_4.pdf`... Code trong notebook sẽ tự động đọc lần lượt từ file số 1 và **tự động dừng khi hết file**.
+> **PDF Naming Convention:** PDFs must strictly follow sequential numbering: `clean_1.pdf`, `clean_2.pdf`, `clean_3.pdf`, `clean_4.pdf`... The code reads continuously starting from index 1 and **automatically terminates when no further PDF is found**.
 
 ---
 
-### Bước 3: Đưa kịch bản và ảnh lên Google Drive
-1. Mở **Google Drive**, tạo thư mục gốc: `AI VIDEO`.
-2. *(Tùy chọn)* Đặt video outro kết thúc vào: `AI VIDEO/material/theend.mp4`.
-3. Tạo thư mục dự án theo `SUB_FOLDER_NAME` (ví dụ: `AI VIDEO/tesla_story/`).
-4. Tải các file vào:
-   * File text kịch bản: `AI VIDEO/tesla_story/tesla_story.txt`.
-   * Thư mục con `image/` chứa các file PDF đã tạo: `clean_1.pdf`, `clean_2.pdf`...
+### Step 3: Upload Files to Google Drive
+1. On your **Google Drive**, create a root folder: `AI VIDEO`.
+2. *(Optional)* Place your outro video at: `AI VIDEO/material/theend.mp4`.
+3. Create your project subfolder matching `SUB_FOLDER_NAME` (e.g., `AI VIDEO/tesla_story/`).
+4. Upload files into their respective locations:
+   * Script file: `AI VIDEO/tesla_story/tesla_story.txt`.
+   * Create an `image` subfolder and place all PDF files inside: `clean_1.pdf`, `clean_2.pdf`...
 
 ---
 
-### Bước 4: Chạy Notebook biến chuỗi ảnh thành Video hoàn chỉnh
-1. Tải file [`Video_producer.ipynb`](./Video_producer.ipynb) lên Google Colab.
-2. **Bật GPU T4 (Tăng tốc render bằng phần cứng):**
-   * Vào menu: **Runtime (Thời gian chạy)** ➔ **Change runtime type (Thay đổi loại thời gian chạy)**.
-   * Tại **Hardware accelerator**: Chọn **T4 GPU** ➔ Bấm **Save (Lưu)**.
-3. **Cập nhật tên dự án tại Cell 2:**
-   Chỉ cần sửa tên dự án và đường dẫn file kịch bản tương ứng:
+### Step 4: Run Notebook on Google Colab (GPU Acceleration)
+1. Open [`Video_producer.ipynb`](./Video_producer.ipynb) in Google Colab.
+2. **Enable Free T4 GPU (Crucial for hardware acceleration):**
+   * Top menu: **Runtime** ➔ **Change runtime type**.
+   * Under **Hardware accelerator**: Select **T4 GPU** ➔ Click **Save**.
+3. **Configure Project Variables in Cell 2:**
+   Update the folder name and script path to match your project:
    ```python
    SUB_FOLDER_NAME = "tesla_story"
    script_file_path = "/content/drive/MyDrive/AI VIDEO/tesla_story/tesla_story.txt"
    ```
-4. **Chạy toàn bộ (Run All):**
-   * Nhấn **Runtime** ➔ **Run all** (hoặc `Ctrl + F9`).
-   * Cấp quyền truy cập Google Drive khi popup xuất hiện.
+4. **Execute All Cells (Run All):**
+   * Click **Runtime** ➔ **Run all** (or press `Ctrl + F9`).
+   * Grant Google Drive access permissions when prompted.
 
 ---
 
-## ⚙️ Cơ Chế Xử Lý Ảnh Thành Video Trong Code
+## ⚙️ How the Code Transforms Images into Video
 
-Hệ thống hoàn toàn **tự động thích ứng với số lượng ảnh bạn cung cấp**:
+The processing pipeline automatically adapts to any quantity of images:
 
-| Giai đoạn | Cell | Cách thức biến chuỗi ảnh thành video |
+| Stage | Cell | Transformation Mechanism |
 |:---|:---:|:---|
-| **Cấu hình GPU** | **Cell 4** | Kích hoạt FFmpeg NVIDIA NVENC (`h264_nvenc`) trên Colab để chuẩn bị xuất video bằng GPU. |
-| **Tạo giọng đọc** | **Cell 6** | Đọc toàn bộ các câu trong kịch bản bằng Microsoft Neural Voice (`edge-tts`), tự đo lường chính xác thời lượng từng câu thoại. |
-| **Bóc tách ảnh** | **Cell 8** | Tự động quét vòng lặp tất cả các file `clean_1.pdf`, `clean_2.pdf`... cho đến hết, bóc tách toàn bộ ảnh gốc không nén vào `clean_image/` thành `1.jpg`, `2.jpg`... |
-| **Đồng bộ thời gian** | **Cell 10** | Khớp thời lượng hiển thị của từng bức ảnh với đúng độ dài câu thoại tương ứng. |
-| **Hiệu ứng chuyển động** | **Cell 12** | Áp dụng thuật toán Ken Burns (Zoom in 15%, Zoom out, Pan lia máy) và hòa trộn mờ chồng (Crossfade) trên từng bức ảnh bằng C++ OpenCV. |
-| **Dựng & Render GPU** | **Cell 14** | Ghép toàn bộ chuỗi ảnh chuyển động + Audio + Video Outro, xuất thẳng thành file MP4 bằng chip GPU NVENC. |
+| **Hardware Setup** | **Cell 4** | Configures NVIDIA NVENC (`h264_nvenc`) on Colab and binds MoviePy to the system GPU FFmpeg binary. |
+| **Voiceover Synthesis** | **Cell 6** | Synthesizes all narration sentences with Microsoft Neural Voice (`edge-tts`) and computes millisecond-precise timestamps. |
+| **Lossless Extraction** | **Cell 8** | Loops through `clean_1.pdf`, `clean_2.pdf`... extracts raw full-resolution images into `clean_image/` (`1.jpg`, `2.jpg`...). |
+| **Timing Alignment** | **Cell 10** | Dynamically locks each image's on-screen duration to its corresponding narration segment. |
+| **Motion & Transitions** | **Cell 12** | Applies Ken Burns camera motion (15% zoom in, zoom out, directional pan) and 0.5s crossfade blends via C++ OpenCV. |
+| **Assembly & GPU Render** | **Cell 14** | Composes all motion clips + audio + outro, and encodes the MP4 using the NVIDIA NVENC hardware chip. |
 
 ---
 
-## 🎬 Thành Phẩm Đầu Ra
+## 🎬 Output Deliverable
 
-* **Định dạng:** Video MP4 Full HD **1080p** (1920x1080), 24 FPS, bitrate 6 Mbps sắc nét.
-* **Thời lượng:** Tùy biến linh hoạt theo số lượng phân cảnh của bạn (từ video ngắn 1–2 phút cho đến video dài 15–20+ phút).
-* **Đường dẫn lưu trữ:**
+* **Video Format:** MP4 Full HD **1080p** (1920x1080), 24 FPS, high-clarity 6 Mbps bitrate.
+* **Duration:** Completely flexible depending on your scene count (from 1–2 minute shorts to 15–20+ minute documentaries).
+* **Storage Location:**
   ```text
   /content/drive/MyDrive/AI VIDEO/<SUB_FOLDER_NAME>/video/COMPLETE_VIDEO.mp4
   ```
-* **Tốc độ:** Nhờ GPU NVIDIA T4, quá trình dựng chuyển động và render video diễn ra siêu tốc, nhanh gấp 4–5 lần so với chạy bằng CPU truyền thống.
+* **Performance:** With NVIDIA T4 GPU encoding, full video rendering completes in **5 to 15 minutes**, up to 4–5x faster than CPU-only rendering.
