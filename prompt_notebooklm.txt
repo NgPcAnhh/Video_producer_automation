@@ -1,0 +1,33 @@
+Hãy sử dụng **`scenes_data` trong tài liệu đã import** để tạo hình ảnh cho **scenes 1-20** và chỉ được tạo đúng 20 bức ảnh tương ứng. 
+đặt tên slide với quy tắc:
+### Quy tắc tạo ảnh
+
+1. Với mỗi scene, xác định đúng `scene_number` và lấy **đúng `image_generation_prompt` tương ứng** làm chỉ dẫn chính.
+2. **Không được tự ý thay đổi, rút gọn hoặc bỏ qua** các chi tiết quan trọng trong `image_generation_prompt`.
+3. Áp dụng nhất quán **MASTER_STYLE_PREFIX: 2D minimalist stick-figure vector line art** cho tất cả các scenes.
+4. Giữ đúng nhân vật, hành động, bối cảnh, thời kỳ, góc máy, bố cục, ánh sáng và mood được mô tả trong prompt.
+5. Mỗi scene phải được tạo thành **một hình ảnh riêng, tỷ lệ 16:9**.
+6. Các hình ảnh phải có **phong cách và thiết kế nhân vật nhất quán** giữa các scenes nhưng vẫn phải giữ đúng đặc điểm riêng của từng prompt.
+7. `script_en` chỉ dùng để hiểu và kiểm tra nội dung scene, **không dùng để thay thế `image_generation_prompt`**.
+
+### Quy tắc bắt buộc
+
+**Chỉ tạo hình ảnh theo prompt. Không tạo slide, không tạo layout và không thêm bất kỳ nội dung chữ nào vào hình ảnh.**
+
+Tuyệt đối không có:
+
+* Số scene
+* Chữ
+* Tiêu đề
+* Caption
+* Subtitle
+* Dialogue
+* Text overlay
+* Watermark
+* Logo
+
+**Không đánh số hình ảnh. Không ghép nhiều scenes vào một ảnh. Mỗi scene = một ảnh riêng.**
+
+Ưu tiên cao nhất là **độ chính xác với `image_generation_prompt` trong tài liệu đã import**.
+
+
