@@ -10,17 +10,17 @@
 > **CORE VIDEO FORMAT**: This system automatically produces **Image-Based Storytelling / Ken Burns Slideshow Videos**.
 > The entire video is composed of a **dynamic sequence of AI-generated still images (10, 30, 60, 120+ scenes — fully customizable)**, brought to life with cinematic camera motions (*Zoom in, Zoom out, Pan left/right/up*) and smooth crossfade transitions, synchronized millisecond-by-millisecond with professional AI voiceover narration.
 
-The end-to-end automated pipeline connects: **LLMs (ChatGPT / Claude / Gemini)** ➔ **NotebookLM (Batch AI Image Generation)** ➔ **Google Drive** ➔ **Google Colab (Hardware-Accelerated Video Rendering via GPU NVENC)**.
+The end-to-end automated pipeline connects: **LLMs (ChatGPT / Claude / Gemini)** ➔ **NotebookLM (Batch AI Image Generation)** ➔ **Google Drive** ➔ **Google Colab (Multi-Threaded CPU Video Rendering)**.
 
 ---
 
 ## ✨ Key Highlights of Image-Based Video Production
 
 * 📸 **Transforming Still Images into Cinematic Shots (Ken Burns Effect):** Each static image is animated with smooth virtual camera motions using high-performance OpenCV C++ (zooming, panning), completely eliminating static presentation fatigue.
-* 🪄 **Seamless Transitions (Crossfade & Fade to Black):** Elegant 0.5s crossfade blends between sequential scenes, with a smooth fade-to-black transition into the ending video (Outro).
+* 🪄 **Seamless Transitions (Crossfade):** Elegant 0.5s crossfade blends between sequential scenes for smooth, natural storytelling.
 * 🔢 **Arbitrary & Dynamic Scene Count (No Fixed Limits):** Create short videos (10–20 images) or in-depth documentary videos (60, 100, 120+ images). The pipeline dynamically detects and calculates durations automatically.
 * 🎙️ **Precise Audio-Visual Synchronization:** Each image duration is automatically aligned down to the millisecond with each sentence spoken by neural AI voiceover (`edge-tts`).
-* ⚡ **Ultra-Fast & Cost-Effective:** Instead of expensive AI video generation tools (Runway, Sora, etc.), render full 10–20 minute image-driven storytelling videos in just **5 to 15 minutes** using Google Colab Free (T4 GPU).
+* ⚙️ **100% Reliable on Google Colab Free:** Fully decoupled from GPU dependencies or Colab GPU quotas. The rendering engine is optimized for multi-threaded CPU (`libx264`, `preset=veryfast`), ensuring consistent, uninterrupted completion on any free Colab account.
 
 ---
 
@@ -34,7 +34,7 @@ flowchart TD
     D --> E["☁️ Step 3: Upload to Google Drive<br/>(/MyDrive/AI VIDEO/project_name/)"]
     B --> E
     E --> F["🚀 Step 4: Colab Converts Images to Video<br/>(Video_producer.ipynb)"]
-    F -->|Ken Burns + Crossfade + Audio + GPU NVENC| G["🎥 Complete Storytelling Video<br/>(COMPLETE_VIDEO.mp4)"]
+    F -->|Ken Burns + Crossfade + Audio + CPU Multi-threading| G["🎥 Complete Storytelling Video<br/>(COMPLETE_VIDEO.mp4)"]
 ```
 
 ---
@@ -46,9 +46,6 @@ flowchart TD
 ```text
 MyDrive/
 └── AI VIDEO/
-    │
-    ├── material/                                 <-- Shared assets directory
-    │   └── theend.mp4                            <-- Outro / Ending video (optional)
     │
     └── <SUB_FOLDER_NAME>/                        <-- Specific project folder (e.g., lion_social)
         │
@@ -111,28 +108,25 @@ MyDrive/
 
 ### Step 3: Upload Files to Google Drive
 1. On your **Google Drive**, create a root folder: `AI VIDEO`.
-2. *(Optional)* Place your outro video at: `AI VIDEO/material/theend.mp4`.
-3. Create your project subfolder matching `SUB_FOLDER_NAME` (e.g., `AI VIDEO/tesla_story/`).
-4. Upload files into their respective locations:
+2. Create your project subfolder matching `SUB_FOLDER_NAME` (e.g., `AI VIDEO/tesla_story/`).
+3. Upload files into their respective locations:
    * Script file: `AI VIDEO/tesla_story/tesla_story.txt`.
    * Create an `image` subfolder and place all PDF files inside: `clean_1.pdf`, `clean_2.pdf`...
 
 ---
 
-### Step 4: Run Notebook on Google Colab (GPU Acceleration)
+### Step 4: Run Notebook on Google Colab (CPU Multi-threading)
 1. Open [`Video_producer.ipynb`](./Video_producer.ipynb) in Google Colab.
-2. **Enable Free T4 GPU (Crucial for hardware acceleration):**
-   * Top menu: **Runtime** ➔ **Change runtime type**.
-   * Under **Hardware accelerator**: Select **T4 GPU** ➔ Click **Save**.
-3. **Configure Project Variables in Cell 2:**
+2. **Configure Project Variables in Cell 2:**
    Update the folder name and script path to match your project:
    ```python
    SUB_FOLDER_NAME = "tesla_story"
    script_file_path = "/content/drive/MyDrive/AI VIDEO/tesla_story/tesla_story.txt"
    ```
-4. **Execute All Cells (Run All):**
+3. **Execute All Cells (Run All):**
    * Click **Runtime** ➔ **Run all** (or press `Ctrl + F9`).
    * Grant Google Drive access permissions when prompted.
+   * The notebook will run reliably on standard CPU multi-threading without GPU requirements.
 
 ---
 
@@ -142,21 +136,21 @@ The processing pipeline automatically adapts to any quantity of images:
 
 | Stage | Cell | Transformation Mechanism |
 |:---|:---:|:---|
-| **Hardware Setup** | **Cell 4** | Configures NVIDIA NVENC (`h264_nvenc`) on Colab and binds MoviePy to the system GPU FFmpeg binary. |
+| **Hardware Setup** | **Cell 4** | Configures multi-threaded CPU rendering environment and installs core libraries. |
 | **Voiceover Synthesis** | **Cell 6** | Synthesizes all narration sentences with Microsoft Neural Voice (`edge-tts`) and computes millisecond-precise timestamps. |
 | **Lossless Extraction** | **Cell 8** | Loops through `clean_1.pdf`, `clean_2.pdf`... extracts raw full-resolution images into `clean_image/` (`1.jpg`, `2.jpg`...). |
 | **Timing Alignment** | **Cell 10** | Dynamically locks each image's on-screen duration to its corresponding narration segment. |
 | **Motion & Transitions** | **Cell 12** | Applies Ken Burns camera motion (15% zoom in, zoom out, directional pan) and 0.5s crossfade blends via C++ OpenCV. |
-| **Assembly & GPU Render** | **Cell 14** | Composes all motion clips + audio + outro, and encodes the MP4 using the NVIDIA NVENC hardware chip. |
+| **Assembly & CPU Render** | **Cell 14** | Composes all motion clips + audio, and exports the final MP4 using optimized multi-threaded CPU (`libx264`, `veryfast`). |
 
 ---
 
 ## 🎬 Output Deliverable
 
-* **Video Format:** MP4 Full HD **1080p** (1920x1080), 24 FPS, high-clarity 6 Mbps bitrate.
+* **Video Format:** MP4 Full HD **1080p** (1920x1080), 24 FPS, high-clarity bitrate.
 * **Duration:** Completely flexible depending on your scene count (from 1–2 minute shorts to 15–20+ minute documentaries).
 * **Storage Location:**
   ```text
   /content/drive/MyDrive/AI VIDEO/<SUB_FOLDER_NAME>/video/COMPLETE_VIDEO.mp4
   ```
-* **Performance:** With NVIDIA T4 GPU encoding, full video rendering completes in **5 to 15 minutes**, up to 4–5x faster than CPU-only rendering.
+* **Reliability:** 100% reliable on Google Colab Free without GPU restrictions, quota limits, or disconnection risks.

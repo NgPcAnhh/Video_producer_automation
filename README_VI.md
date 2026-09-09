@@ -10,17 +10,17 @@
 > **ĐỊNH DẠNG VIDEO CỐT LÕI**: Đây là hệ thống tự động sản xuất **Video dạng chạy ảnh động kể chuyện (Image-Based Storytelling / Ken Burns Slideshow)**. 
 > Toàn bộ video được tạo nên từ **chuỗi ảnh tĩnh AI với số lượng linh hoạt tùy ý (10, 30, 60, 120+ ảnh...)**, được thổi hồn bằng các chuyển động điện ảnh (*Zoom in, Zoom out, Pan lia máy*) và chuyển cảnh mờ chồng (*Crossfade*), đồng bộ khớp từng mili-giây với giọng đọc AI chuyên nghiệp.
 
-Hệ thống kết hợp quy trình khép kín: **LLM (ChatGPT/Claude/Gemini)** ➔ **NotebookLM (Sinh ảnh AI hàng loạt)** ➔ **Google Drive** ➔ **Google Colab (Dựng video chạy ảnh siêu tốc bằng GPU NVENC)**.
+Hệ thống kết hợp quy trình khép kín: **LLM (ChatGPT/Claude/Gemini)** ➔ **NotebookLM (Sinh ảnh AI hàng loạt)** ➔ **Google Drive** ➔ **Google Colab (Dựng video chạy ảnh tối ưu đa luồng CPU)**.
 
 ---
 
 ## ✨ Điểm Nổi Bật Của Định Dạng Video Chạy Ảnh
 
 * 📸 **Biến Ảnh Tĩnh Thành Thước Phim Động (Ken Burns Effect):** Mỗi bức ảnh tĩnh được áp dụng hiệu ứng camera giả lập bằng OpenCV C++ (phóng to, thu nhỏ, quét ngang, lia dọc), loại bỏ cảm giác xem ảnh tĩnh nhàm chán.
-* 🪄 **Chuyển Cảnh Mượt Mà (Crossfade & Fade):** Chuyển tiếp giữa các bức ảnh bằng hiệu ứng hòa tan mờ chồng (Crossfade) 0.5s và mờ đen (Fade to black) với video kết thúc (Outro).
+* 🪄 **Chuyển Cảnh Mượt Mà (Crossfade):** Chuyển tiếp giữa các bức ảnh bằng hiệu ứng hòa tan mờ chồng (Crossfade) 0.5s mượt mà, tự nhiên.
 * 🔢 **Tùy Biến Số Lượng Phân Cảnh (Không Giới Hạn):** Bạn có thể làm video ngắn (10–20 ảnh) hoặc video dài tài liệu (60, 100, 120+ ảnh). Code sẽ tự động nhận diện và tính toán thời lượng tương ứng.
 * 🎙️ **Đồng Bộ Giọng Đọc & Thời Lượng Từng Ảnh:** Mỗi bức ảnh hiển thị chuẩn xác theo thời lượng câu đọc của AI (`edge-tts`), không bị lệch hình hay hụt tiếng.
-* ⚡ **Tối Ưu Chi Phí & Tốc Độ:** Thay vì tốn kém chi phí render video AI (Runway, Sora...), hệ thống tạo video documentary/storytelling chạy ảnh chỉ mất **vài phút đến 15 phút** trên Google Colab Free (T4 GPU).
+* ⚙️ **Hoạt Động Ổn Định 100% Trên Colab Free:** Không phụ thuộc vào GPU, không lo hết hạn ngạch (quota) GPU của Colab. Hệ thống tối ưu hóa render bằng CPU đa luồng (`libx264`, `preset=veryfast`), chạy mượt mà trên mọi tài khoản Colab miễn phí.
 
 ---
 
@@ -34,7 +34,7 @@ flowchart TD
     D --> E["☁️ Bước 3: Đưa ảnh lên Google Drive<br/>(/MyDrive/AI VIDEO/tên_dự_án/)"]
     B --> E
     E --> F["🚀 Bước 4: Colab tự quét và biến ảnh thành Video<br/>(Video_producer.ipynb)"]
-    F -->|Ken Burns + Crossfade + Audio + GPU NVENC| G["🎥 Video Chạy Ảnh Hoàn Chỉnh<br/>(COMPLETE_VIDEO.mp4)"]
+    F -->|Ken Burns + Crossfade + Audio + CPU Multi-threading| G["🎥 Video Chạy Ảnh Hoàn Chỉnh<br/>(COMPLETE_VIDEO.mp4)"]
 ```
 
 ---
@@ -46,9 +46,6 @@ Toàn bộ code trong [`Video_producer.ipynb`](./Video_producer.ipynb) được 
 ```text
 MyDrive/
 └── AI VIDEO/
-    │
-    ├── material/                                 <-- Thư mục tài nguyên dùng chung
-    │   └── theend.mp4                            <-- Video outro/kết thúc (tùy chọn)
     │
     └── <SUB_FOLDER_NAME>/                        <-- Thư mục dự án cụ thể (Ví dụ: lion_social)
         │
@@ -111,9 +108,8 @@ MyDrive/
 
 ### Bước 3: Đưa kịch bản và ảnh lên Google Drive
 1. Mở **Google Drive**, tạo thư mục gốc: `AI VIDEO`.
-2. *(Tùy chọn)* Đặt video outro kết thúc vào: `AI VIDEO/material/theend.mp4`.
-3. Tạo thư mục dự án theo `SUB_FOLDER_NAME` (ví dụ: `AI VIDEO/tesla_story/`).
-4. Tải các file vào:
+2. Tạo thư mục dự án theo `SUB_FOLDER_NAME` (ví dụ: `AI VIDEO/tesla_story/`).
+3. Tải các file vào:
    * File text kịch bản: `AI VIDEO/tesla_story/tesla_story.txt`.
    * Thư mục con `image/` chứa các file PDF đã tạo: `clean_1.pdf`, `clean_2.pdf`...
 
@@ -121,18 +117,16 @@ MyDrive/
 
 ### Bước 4: Chạy Notebook biến chuỗi ảnh thành Video hoàn chỉnh
 1. Tải file [`Video_producer.ipynb`](./Video_producer.ipynb) lên Google Colab.
-2. **Bật GPU T4 (Tăng tốc render bằng phần cứng):**
-   * Vào menu: **Runtime (Thời gian chạy)** ➔ **Change runtime type (Thay đổi loại thời gian chạy)**.
-   * Tại **Hardware accelerator**: Chọn **T4 GPU** ➔ Bấm **Save (Lưu)**.
-3. **Cập nhật tên dự án tại Cell 2:**
+2. **Cập nhật tên dự án tại Cell 2:**
    Chỉ cần sửa tên dự án và đường dẫn file kịch bản tương ứng:
    ```python
    SUB_FOLDER_NAME = "tesla_story"
    script_file_path = "/content/drive/MyDrive/AI VIDEO/tesla_story/tesla_story.txt"
    ```
-4. **Chạy toàn bộ (Run All):**
-   * Nhấn **Runtime** ➔ **Run all** (hoặc `Ctrl + F9`).
+3. **Chạy toàn bộ (Run All):**
+   * Nhấn **Runtime (Thời gian chạy)** ➔ **Run all (Chạy tất cả)** (hoặc phím tắt `Ctrl + F9`).
    * Cấp quyền truy cập Google Drive khi popup xuất hiện.
+   * Notebook sẽ tự động chạy mượt mà bằng CPU đa luồng mà không cần GPU.
 
 ---
 
@@ -142,21 +136,21 @@ Hệ thống hoàn toàn **tự động thích ứng với số lượng ảnh b
 
 | Giai đoạn | Cell | Cách thức biến chuỗi ảnh thành video |
 |:---|:---:|:---|
-| **Cấu hình GPU** | **Cell 4** | Kích hoạt FFmpeg NVIDIA NVENC (`h264_nvenc`) trên Colab để chuẩn bị xuất video bằng GPU. |
+| **Cấu hình hệ thống** | **Cell 4** | Cấu hình môi trường đa luồng CPU và cài đặt các thư viện cần thiết. |
 | **Tạo giọng đọc** | **Cell 6** | Đọc toàn bộ các câu trong kịch bản bằng Microsoft Neural Voice (`edge-tts`), tự đo lường chính xác thời lượng từng câu thoại. |
 | **Bóc tách ảnh** | **Cell 8** | Tự động quét vòng lặp tất cả các file `clean_1.pdf`, `clean_2.pdf`... cho đến hết, bóc tách toàn bộ ảnh gốc không nén vào `clean_image/` thành `1.jpg`, `2.jpg`... |
 | **Đồng bộ thời gian** | **Cell 10** | Khớp thời lượng hiển thị của từng bức ảnh với đúng độ dài câu thoại tương ứng. |
 | **Hiệu ứng chuyển động** | **Cell 12** | Áp dụng thuật toán Ken Burns (Zoom in 15%, Zoom out, Pan lia máy) và hòa trộn mờ chồng (Crossfade) trên từng bức ảnh bằng C++ OpenCV. |
-| **Dựng & Render GPU** | **Cell 14** | Ghép toàn bộ chuỗi ảnh chuyển động + Audio + Video Outro, xuất thẳng thành file MP4 bằng chip GPU NVENC. |
+| **Dựng & Render CPU** | **Cell 14** | Ghép toàn bộ chuỗi ảnh chuyển động + Audio, xuất trực tiếp thành file MP4 bằng CPU đa luồng tối ưu (`veryfast`). |
 
 ---
 
 ## 🎬 Thành Phẩm Đầu Ra
 
-* **Định dạng:** Video MP4 Full HD **1080p** (1920x1080), 24 FPS, bitrate 6 Mbps sắc nét.
+* **Định dạng:** Video MP4 Full HD **1080p** (1920x1080), 24 FPS, bitrate chuẩn sắc nét.
 * **Thời lượng:** Tùy biến linh hoạt theo số lượng phân cảnh của bạn (từ video ngắn 1–2 phút cho đến video dài 15–20+ phút).
 * **Đường dẫn lưu trữ:**
   ```text
   /content/drive/MyDrive/AI VIDEO/<SUB_FOLDER_NAME>/video/COMPLETE_VIDEO.mp4
   ```
-* **Tốc độ:** Nhờ GPU NVIDIA T4, quá trình dựng chuyển động và render video diễn ra siêu tốc, nhanh gấp 4–5 lần so với chạy bằng CPU truyền thống.
+* **Tính ổn định:** Chạy 100% ổn định trên mọi tài khoản Google Colab Free mà không lo bị ngắt kết nối hay hết quota GPU.
