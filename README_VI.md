@@ -24,6 +24,14 @@ Hệ thống kết hợp quy trình khép kín: **LLM (ChatGPT/Claude/Gemini)** 
 
 ---
 
+## 📺 Video Hướng Dẫn Quy Trình
+
+https://github.com/NgPcAnhh/Video_producer_automation/raw/main/workflow_overview_video.mp4
+
+> 💡 *Nếu trình phát video không tự động tải, bạn có thể [bấm vào đây để xem hoặc tải video về](./workflow_overview_video.mp4).*
+
+---
+
 ## 📌 Sơ Đồ Quy Trình Tổng Quan (Pipeline)
 
 ```mermaid

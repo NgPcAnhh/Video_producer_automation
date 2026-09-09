@@ -24,6 +24,14 @@ The end-to-end automated pipeline connects: **LLMs (ChatGPT / Claude / Gemini)**
 
 ---
 
+## 📺 Workflow Demo Video
+
+https://github.com/NgPcAnhh/Video_producer_automation/raw/main/workflow_overview_video.mp4
+
+> 💡 *If the video player does not display above, you can [view or download the video directly here](./workflow_overview_video.mp4).*
+
+---
+
 ## 📌 Pipeline Architecture
 
 ```mermaid
